@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Focus Flow Engine - ADHD Guardian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define custom colors using CSS variables */
+        body {
+          font-family: 'Inter', sans-serif;
+          background-color: #fefce8;
+        }
+    
+        .corner-shape {
+          position: absolute;
+          width: 500px;
+          height: 390px;
+          z-index: 0;
+          border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+    
+        .top-left {
+          top: 0;
+          left: 0;
+          background-color: #fca5a5; /* coral red */
+        }
+    
+        .top-right {
+          top: 0;
+          right: 0;
+          background-color: #fde68a; /* yellow */
+        }
+    
+        .bottom-left {
+          bottom: 0;
+          left: 0;
+          background-color: #86efac; /* mint green */
+        }
+    
+        .bottom-right {
+          bottom: 0;
+          right: 0;
+          background-color: #c4b5fd; /* soft purple */
+        }
+    </style>
+</head>
+<body class="relative min-h-screen flex items-center justify-center overflow-hidden p-4 bg-[#fefce8]">
+
+    <!-- Fixed Color Corner Blobs -->
+    <div class="corner-shape top-left"></div>
+    <div class="corner-shape top-right"></div>
+    <div class="corner-shape bottom-left"></div>
+    <div class="corner-shape bottom-right"></div>
+      
+  
+    <!-- Card -->
+    <div class="relative z-10 bg-[#ecfdf5] rounded-3xl shadow-xl w-full max-w-md p-8 space-y-6">
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-bold text-[var(--text-dark)]">ADHD Guardian</h1>
+            <p class="text-[var(--text-medium)] text-lg">Your AI partner for focus flow.</p>
+        </div>
+
+        <div class="text-center h-10"> {% if user %}
+                <p class="text-sm text-gray-600">
+                    Signed in as: <strong id="user-welcome" class="font-medium text-gray-800">{{ user.name }}</strong>
+                    <a href="{{ url_for('logout') }}" class="logout-link ml-2">(Logout)</a>
+                    <br> <a href="{{ url_for('get_calendar') }}" class="text-xs text-indigo-600 hover:underline ml-4">View Calendar</a>
+                    <a href="{{ url_for('get_tasks') }}" class="text-xs text-indigo-600 hover:underline ml-2">View Tasks</a>
+                </p>
+             {% else %}
+             
+                <button class="flex items-center justify-center gap-2 w-full bg-[#d1fae5] hover:bg-[#bbf7d0] text-[#1f2937] font-semibold py-2 px-4 rounded-md shadow transition">
+                    <img src="https://img.icons8.com/color/24/000000/microsoft.png" alt="Microsoft Icon"/>
+                    Sign in with Microsoft
+                </button>
+    
+             {% endif %}
+        </div>
+
+        <div>
+            <label for="task-input" class="block text-[var(--text-dark)] font-medium mb-2">What's in your to-do lists:</label>
+            <textarea
+                id="task-input"
+                rows="3"
+                placeholder="e.g. Plan the team building event..."
+                class="w-full px-4 py-2 bg-white/70 border border-green-300 rounded-md shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[var(--warm-coral)] focus:border-[var(--warm-coral)] focus:outline-none transition"
+            ></textarea>
+        </div>
+
+        <button 
+          id="submit-button" 
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-md transition"
+          onclick="alert('Breaking down your task...')"
+        >
+          Break it Down
+        </button>
+      
+
+        <div id="loading-message" class="text-center text-[var(--text-medium)] mt-4 py-2" style="display: none;">
+             <svg class="animate-spin h-5 w-5 text-gray-500 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Breaking down your tasks... 🤔
+        </div>
+        <div id="login-prompt-message" class="login-prompt" role="alert" style="display: none;">
+            <span class="block sm:inline">Please sign in first to use this feature.</span>
+             <a href="/login" class="font-bold hover:text-yellow-900 ml-2">Sign in Now</a>
+        </div>
+        <div id="error-message" class="error-message" role="alert" style="display: none;">
+            <strong class="font-bold">Oops!</strong>
+            <span class="block sm:inline">Something went wrong.</span> </div>
+
+        <div id="result-area" class="mt-6 border-t border-green-200/50 pt-5 space-y-1 opacity-0" style="display: none;">
+            <div id="steps-section" class="output-box">
+                <pre id="steps-output" class="text-sm leading-relaxed"></pre>
+            </div>
+            <div id="encouragement-section" class="output-box text-sm italic font-medium text-center text-purple-800 bg-purple-50 border-purple-200">
+                <p id="encouragement-output"></p> </div>
+        </div>
+
+    </div> <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        const resultArea = document.getElementById('result-area');
+        if (resultArea) {
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        if (resultArea.style.display === 'block') { requestAnimationFrame(() => { resultArea.style.opacity = 1; }); }
+                        else { resultArea.style.opacity = 0; }
+                    }
+                });
+            });
+            observer.observe(resultArea, { attributes: true });
+        }
+    </script>
+</body>
+</html>
