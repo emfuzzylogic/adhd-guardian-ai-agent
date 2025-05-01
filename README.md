@@ -47,10 +47,6 @@ The goal is not to replace planning tools but to provide the scaffolding and dop
 ![Component Diagram](https://github.com/emfuzzylogic/adhd-guardian-ai-agent/blob/main/System%20Design/Component%20breakdown.png)
 
 
-### Task Decomposition Flow
-
-![Task Decomposition Flow](https://github.com/emfuzzylogic/adhd-guardian-ai-agent/blob/main/System%20Design/Task%20Decomposition.png)
-
 ### Technology Stack
 
 ![Technology Stack](https://github.com/emfuzzylogic/adhd-guardian-ai-agent/blob/main/System%20Design/Technology%20Stack.png)
@@ -243,8 +239,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🙏 Acknowledgments
 
-- Special thanks to the ADHD community whose insights helped shape this tool
-- Microsoft AI Agents Hackathon 2025 for the opportunity to showcase this solution
+- Special thanks to people and organizations who support and advocate for neurodivergent
 - All neurodivergent individuals whose unique perspectives drive innovation
 
 ---
