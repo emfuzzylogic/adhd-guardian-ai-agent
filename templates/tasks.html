@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Focus Flow Engine - ADHD Guardian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define custom colors using CSS variables */
+        :root {
+            --cool-mint: #B8F2E6;
+            --sky-indigo: #6C91BF;
+            --warm-coral: #FF6B6B;
+            --sage-mist: #D2E3C8;
+            --text-dark: #333333;
+            --text-medium: #555555;
+            --card-bg: #ecfdf5; /* Match index card bg */
+            --body-bg: #fefce8; /* Match index body bg */
+        }
+        
+        body {
+          font-family: 'Inter', sans-serif;
+          background-color: #fefce8;
+        }
+        .corner-shape {
+          position: absolute;
+          width: 500px;
+          height: 390px;
+          z-index: 0;
+          border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+    
+        .top-left {
+          top: 0;
+          left: 0;
+          background-color: #fca5a5; /* coral red */
+        }
+    
+        .top-right {
+          top: 0;
+          right: 0;
+          background-color: #fde68a; /* yellow */
+        }
+    
+        .bottom-left {
+          bottom: 0;
+          left: 0;
+          background-color: #86efac; /* mint green */
+        }
+    
+        .bottom-right {
+          bottom: 0;
+          right: 0;
+          background-color: #c4b5fd; /* soft purple */
+        }
+        .logout-link { color: var(--warm-coral); font-size: 0.75rem; }
+        .logout-link:hover { text-decoration: underline; }
+        .back-link { @apply text-sm text-[var(--sky-indigo)] hover:underline; }
+        .task-item { @apply p-4 border border-gray-200 rounded-lg bg-white/70 shadow-sm flex justify-between items-start gap-4; /* Changed items-center to items-start */ }
+        .task-content { @apply flex-grow; } /* Container for title, due date, etc. */
+        .task-title { @apply font-medium text-[var(--text-dark)]; }
+        .task-due { @apply text-xs text-[var(--warm-coral)] font-medium; } /* Made due date medium weight */
+        .task-importance-high { @apply text-xs font-semibold text-red-700; }
+        .task-importance-low { @apply text-xs font-semibold text-yellow-700; }
+        .breakdown-button { background-color: var(--warm-coral); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 0.25rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: background-color 0.15s ease-in-out; flex-shrink: 0; margin-top: 4px; /* Align button slightly lower */ }
+        .breakdown-button:hover { background-color: #E55A5A; }
+        .main-container { background-color: var(--card-bg); border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); padding: 2rem 2.5rem; max-width: 42rem; width: 100%; position: relative; }
+        .header-nav { @apply w-full max-w-4xl p-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-md mb-6 flex justify-between items-center; }
+        /* Countdown Timer Styles */
+        .countdown-timer {
+            font-size: 0.75rem; /* text-xs */
+            color: var(--text-medium);
+            margin-top: 0.25rem; /* mt-1 */
+            font-weight: 500; /* font-medium */
+        }
+        .countdown-timer.past-due {
+            color: var(--warm-coral); /* Use coral for past due */
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <!-- Fixed Color Corner Blobs -->
+    <div class="corner-shape top-left"></div>
+    <div class="corner-shape top-right"></div>
+    <div class="corner-shape bottom-left"></div>
+    <div class="corner-shape bottom-right"></div>
+   
+   
+    <nav class="header-nav">
+        <a href="{{ url_for('index') }}" class="text-lg font-semibold text-[var(--sky-indigo)] hover:text-indigo-800">ADHD Guardian ✨</a>
+        <div>
+            {% if session.get("user") %}
+                 <span class="text-sm text-gray-700 mr-3">
+                    Signed in as: <strong class="font-medium text-gray-800">{{ session.get("user").name }}</strong>
+                 </span>
+                <a href="{{ url_for('logout') }}" class="logout-link">(Logout)</a>
+            {% else %}
+                 <a href="{{ url_for('login') }}" class="text-sm text-indigo-600 hover:underline">Login Required</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="main-container">
+         <div class="flex justify-between items-center mb-6">
+             <h1 class="text-2xl font-bold text-gray-800">Your Incomplete To-Do Tasks</h1>
+             <a href="{{ url_for('index') }}" class="back-link">&larr; Back to Home</a>
+         </div>
+         <p class="text-sm text-gray-600 mb-4 italic">
+             (Showing tasks from lists named:
+             {% if target_lists %}
+                 {{ target_lists|join(', ') }}
+             {% else %}
+                 Default 'Tasks' list
+             {% endif %}.
+             Integration with other lists is future work.)
+         </p>
+
+         {% if tasks is not none %} {# Check if tasks is not None (meaning fetch was attempted) #}
+            {% if tasks %} {# Check if the tasks list is not empty #}
+                <ul class="space-y-3">
+                    {% for task in tasks %}
+                        <li class="task-item" {% if task.dueDateTime and task.dueDateTime.dateTime %}data-due-date="{{ task.dueDateTime.dateTime }}"{% endif %}>
+                            <div class="task-content">
+                                <h3 class="task-title">{{ task.title | default('No Title') }}</h3>
+                                {% if task.dueDateTime and task.dueDateTime.dateTime %}
+                                <p class="task-due">
+                                    Due: {{ task.dueDateTime.dateTime | format_datetime('%Y-%m-%d %H:%M') }}
+                                    {% if task.dueDateTime.timeZone %}({{ task.dueDateTime.timeZone }}){% endif %}
+                                </p>
+                                <div class="countdown-timer">Calculating time left...</div>
+                                {% endif %}
+                                {% if task.importance and task.importance != 'normal' %}
+                                    <span class="block mt-1 {% if task.importance == 'high' %}task-importance-high{% else %}task-importance-low{% endif %}">
+                                        Importance: {{ task.importance | capitalize }}
+                                    </span>
+                                {% endif %}
+                             </div>
+                             <button class="breakdown-button" data-task-id="{{ task.id }}" data-task-title="{{ task.title }}">
+                                 Break Down
+                             </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                 <p class="text-gray-600">No incomplete tasks found in the specified list(s).</p>
+            {% endif %}
+        {% else %}
+             <p class="text-gray-600 italic">Could not fetch task data. Please ensure you are logged in and have granted permissions.</p>
+            {% if error %} {# Display specific error from backend if available #}
+                 <p class="text-xs text-red-500 mt-2">{{ error }}</p>
+            {% endif %}
+        {% endif %}
+
+    </div>
+
+     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Countdown timer script remains the same as v2.1
+        function formatTimeLeft(milliseconds) {
+            if (milliseconds < 0) { return { text: "Past Due", pastDue: true }; }
+            let seconds = Math.floor(milliseconds / 1000);
+            let minutes = Math.floor(seconds / 60);
+            let hours = Math.floor(minutes / 60);
+            let days = Math.floor(hours / 24);
+            hours = hours % 24; minutes = minutes % 60;
+            let parts = [];
+            if (days > 0) parts.push(days + (days === 1 ? " day" : " days"));
+            if (hours > 0) parts.push(hours + (hours === 1 ? " hour" : " hours"));
+            if (days === 0 && hours < 24 && minutes > 0) parts.push(minutes + (minutes === 1 ? " minute" : " minutes"));
+            if (days === 0 && hours === 0 && minutes > 0) parts = [minutes + (minutes === 1 ? " minute" : " minutes")];
+            else if (days === 0 && hours === 0 && minutes === 0 && seconds > 0) return { text: "Due very soon", pastDue: false };
+            else if (days === 0 && hours === 0 && minutes === 0 && seconds <= 0) return { text: "Due now", pastDue: false };
+            if (parts.length === 0 && milliseconds >= 0) return { text: "Due very soon", pastDue: false };
+            else if (parts.length === 0 && milliseconds < 0) return { text: "Past Due", pastDue: true };
+            return { text: parts.join(', ') + " left", pastDue: false };
+        }
+        function updateCountdowns() {
+            const now = new Date();
+            document.querySelectorAll('li[data-due-date]').forEach(item => {
+                const dueDateStr = item.dataset.dueDate;
+                const countdownElement = item.querySelector('.countdown-timer');
+                if (dueDateStr && countdownElement) {
+                    try {
+                        let correctedDateStr = dueDateStr.replace(' ', 'T');
+                        if (!correctedDateStr.endsWith('Z') && !correctedDateStr.match(/[+-]\d{2}:\d{2}$/)) { correctedDateStr += 'Z'; }
+                        const dueDate = new Date(correctedDateStr);
+                        if (isNaN(dueDate.getTime())) { throw new Error("Invalid date parsed"); }
+                        const timeLeftMs = dueDate.getTime() - now.getTime();
+                        const timeLeftFormatted = formatTimeLeft(timeLeftMs);
+                        countdownElement.textContent = `Time Left: ${timeLeftFormatted.text}`;
+                        countdownElement.classList.toggle('past-due', timeLeftFormatted.pastDue);
+                    } catch (e) {
+                        console.error("Error parsing date:", dueDateStr, e);
+                        countdownElement.textContent = "Invalid due date";
+                         countdownElement.classList.add('past-due');
+                    }
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCountdowns();
+            setInterval(updateCountdowns, 60000); // Update every 60 seconds
+        });
+    </script>
+
+</body>
+</html>
