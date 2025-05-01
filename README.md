@@ -19,7 +19,7 @@ For the estimated 4-5% of adults worldwide living with ADHD (approximately 366 m
 
 Standard productivity tools often feel rigid or even add to the overwhelm, lacking the specific support needed to bridge the gap between intention and action. The result? Frustration, procrastination, missed deadlines, and untapped potential—all contributing to the estimated $67 billion in lost workplace productivity annually attributed to ADHD.
 
-### 💡 Our Solution
+### 💡 Solution
 
 ADHD Guardian acts as a non-judgmental, supportive co-pilot specifically designed to help neurodivergent individuals navigate executive function hurdles. Instead of just listing tasks, it tackles the critical first step: **task initiation**.
 
@@ -52,7 +52,17 @@ The goal is not to replace planning tools but to provide the scaffolding and dop
 ![Technology Stack](https://github.com/emfuzzylogic/adhd-guardian-ai-agent/blob/main/System%20Design/Technology%20Stack.png)
 
 
-### Application Screenshots
+
+## ✨ Key Features (Current MVP)
+
+- **AI-Powered Task Decomposition**: Uses Azure OpenAI (GPT-4o) to break down user-inputted tasks
+- **Contextual Encouragement**: Provides tailored, non-judgmental prompts focused on the first action step
+- **Microsoft Account Authentication**: Secure login via Azure AD using MSAL for Python
+- **Simple Web Interface**: Clean UI built with Flask, HTML, and Tailwind CSS
+- **(Demo) Task & Calendar Views**: Placeholder pages showing hardcoded tasks and basic calendar fetching via Microsoft Graph API (requires user consent)
+
+
+### AI Agent UI Page Screenshots
 
 #### Login Screen
 ![Login Screen](https://github.com/emfuzzylogic/adhd-guardian-ai-agent/blob/main/UI/home%20page-not%20logged%20in.png)
@@ -70,15 +80,6 @@ The goal is not to replace planning tools but to provide the scaffolding and dop
 ![Task Breakdown](https://github.com/emfuzzylogic/adhd-guardian-ai-agent/blob/main/UI/after%20break%20down%20tasks.png)
 
                 
-## ✨ Key Features (Current MVP)
-
-- **AI-Powered Task Decomposition**: Uses Azure OpenAI (GPT-4o) to break down user-inputted tasks
-- **Contextual Encouragement**: Provides tailored, non-judgmental prompts focused on the first action step
-- **Microsoft Account Authentication**: Secure login via Azure AD using MSAL for Python
-- **Simple Web Interface**: Clean UI built with Flask, HTML, and Tailwind CSS
-- **(Demo) Task & Calendar Views**: Placeholder pages showing hardcoded tasks and basic calendar fetching via Microsoft Graph API (requires user consent)
-
-
 
 
 ## 📱 Real-World Scenarios
