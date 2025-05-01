@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - ADHD Guardian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+     <style>
+        /* Define custom colors using CSS variables */
+        :root {
+            --cool-mint: #B8F2E6;
+            --sky-indigo: #6C91BF;
+            --warm-coral: #FF6B6B;
+            --sage-mist: #D2E3C8;
+            --text-dark: #333333;
+            --text-medium: #555555;
+            --card-bg: #ecfdf5; /* Match index card bg */
+            --body-bg: #fefce8; /* Match index body bg */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--body-bg);
+        }
+        .logout-link {
+             color: var(--warm-coral);
+             font-size: 0.75rem; /* text-xs */
+         }
+         .logout-link:hover {
+             text-decoration: underline;
+         }
+         .back-link {
+             @apply text-sm text-[var(--sky-indigo)] hover:underline;
+         }
+         .event-item {
+             @apply p-4 border border-gray-200 rounded-lg bg-white/70 shadow-sm;
+         }
+         .event-subject {
+             @apply font-semibold text-lg text-[var(--text-dark)];
+         }
+         .event-time {
+             @apply text-sm text-[var(--text-medium)];
+         }
+         /* Main container styling */
+         .main-container {
+            background-color: var(--card-bg); /* Match index card bg */
+            border-radius: 1.5rem; /* rounded-2xl */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* shadow-xl */
+            padding: 2rem 2.5rem; /* p-8 sm:p-10 md:p-12 */
+            max-width: 42rem; /* max-w-2xl - Adjusted for potentially longer lists */
+            width: 100%;
+            position: relative;
+            /* overflow: hidden; */ /* Removed overflow hidden for potentially longer content */
+         }
+          /* Header/Nav styling */
+         .header-nav {
+             @apply w-full max-w-4xl p-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-md mb-6 flex justify-between items-center;
+         }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <nav class="header-nav">
+        <a href="{{ url_for('index') }}" class="text-lg font-semibold text-[var(--sky-indigo)] hover:text-indigo-800">ADHD Guardian ✨</a>
+        <div>
+            {% if session.get("user") %}
+                 <span class="text-sm text-gray-700 mr-3">
+                    Signed in as: <strong class="font-medium text-gray-800">{{ session.get("user").name }}</strong>
+                 </span>
+                <a href="{{ url_for('logout') }}" class="logout-link">(Logout)</a>
+            {% else %}
+                 <a href="{{ url_for('login') }}" class="text-sm text-indigo-600 hover:underline">Login Required</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Upcoming Calendar Events</h1>
+            <a href="{{ url_for('index') }}" class="back-link">&larr; Back to Home</a>
+        </div>
+        <p class="text-sm text-gray-600 mb-4 italic">(Showing events for the next 7 days)</p>
+
+        {% if events %}
+            <ul class="space-y-4">
+                {% for event in events %}
+                    <li class="event-item">
+                        <h3 class="event-subject">{{ event.subject | default('No Subject') }}</h3>
+                        {% if event.start and event.end and event.start.dateTime and event.end.dateTime %}
+                            <p class="event-time">
+                                Start: {{ event.start.dateTime | format_datetime }} ({{ event.start.timeZone }})
+                            </p>
+                            <p class="event-time">
+                                End: {{ event.end.dateTime | format_datetime }} ({{ event.end.timeZone }})
+                            </p>
+                        {% else %}
+                             <p class="text-sm text-gray-500 italic">Time information unavailable.</p>
+                        {% endif %}
+                    </li>
+                {% else %}
+                 <p class="text-gray-600">No upcoming events found in the next 7 days.</p>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600 italic">Could not fetch calendar data. Please ensure you are logged in and have granted permissions.</p>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
