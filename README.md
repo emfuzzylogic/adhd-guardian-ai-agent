@@ -4,6 +4,10 @@
 
 > "For those of us with ADHD, starting tasks isn't just about discipline—it's about overcoming invisible executive function barriers that others don't see. ADHD Guardian is the empathetic AI companion I wish I'd had throughout my own journey."
 
+
+<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1080460101?h=e20c138d57&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="ADHD Guardian -Microsoft AI Agent Hackathon"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+
+
 ## 🌟 Project Overview
 
 **ADHD Guardian** is an AI-powered web application specifically designed as a supportive work companion for professionals and students with ADHD. It aims to mitigate executive function challenges by providing AI-driven task decomposition, prioritization assistance, and positive reinforcement—all while integrating seamlessly with Microsoft productivity tools.
