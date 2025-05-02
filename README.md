@@ -5,8 +5,6 @@
 > "For those of us with ADHD, starting tasks isn't just about discipline—it's about overcoming invisible executive function barriers that others don't see. ADHD Guardian is the empathetic AI companion I wish I'd had throughout my own journey."
 
 
-<iframe src="https://player.vimeo.com/video/1080460101?h=e20c138d57&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" allowfullscreen title="ADHD Guardian -Microsoft AI Agent Hackathon"></iframe>
-
 
 ## 🌟 Project Overview
 
